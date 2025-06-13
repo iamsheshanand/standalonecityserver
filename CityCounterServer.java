@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 @SuppressWarnings("deprecation")
 public class CityCounterServer {
 
-    // API endpoint (replace with valid URL and key if needed)
     private static final String API_URL = "https://samples.openweathermap.org/data/2.5/box/city?bbox=12,32,15,37,10&appid=b6907d289e10d714a6e88b30761fae22";
 
     // Simple class to represent the response
@@ -33,7 +32,6 @@ public class CityCounterServer {
         }
 
         public String toJson() {
-            // Using Java 17+ text blocks for cleaner JSON formatting
             return """
                 {
                     "count": %d,
@@ -50,7 +48,7 @@ public class CityCounterServer {
         // Create HTTP server on port 8080
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/cities/count", new CityHandler());
-        server.setExecutor(null); // Use default executor
+        server.setExecutor(null);
         server.start();
 
         System.out.println("Server started on port 8080");
@@ -78,22 +76,11 @@ public class CityCounterServer {
                 String input = letter.trim();
                 List<String> allCities = fetchCitiesFromApi();
                 List<String> matchingCities;
-                if (input.length() == 1) {
                     // Filter cities starting with the letter (case-insensitive)
                     String firstLetter = input.toLowerCase();
                     matchingCities = allCities.stream()
                             .filter(name -> name.toLowerCase().startsWith(firstLetter))
-                            .map(name -> name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase())
-                            .sorted()
                             .collect(Collectors.toList());
-                } else {
-                    // Exact match for city name (case-insensitive)
-                    String normalizedInput = input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
-                    matchingCities = allCities.stream()
-                            .filter(name -> name.equalsIgnoreCase(normalizedInput))
-                            .map(name -> name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase())
-                            .collect(Collectors.toList());
-                }
                 response = new CityCountResponse(matchingCities.size(), matchingCities);
             }
 
